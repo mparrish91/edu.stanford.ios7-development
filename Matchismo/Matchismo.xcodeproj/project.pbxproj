@@ -124,17 +124,8 @@
 		285DAF8C185B98310075420E /* Matchismo */ = {
 			isa = PBXGroup;
 			children = (
-				285DAF95185B98320075420E /* CardGameAppDelegate.h */,
-				285DAF96185B98320075420E /* CardGameAppDelegate.m */,
 				285DAF98185B98320075420E /* Main.storyboard */,
-				285DAFBB185BBD5C0075420E /* Card.h */,
-				285DAFBC185BBD5C0075420E /* Card.m */,
-				285DAFBE185BC0DF0075420E /* Deck.h */,
-				285DAFC4185BC82E0075420E /* PlayingCardDeck.h */,
-				285DAFC5185BC82E0075420E /* PlayingCardDeck.m */,
-				285DAFBF185BC0DF0075420E /* Deck.m */,
-				285DAFC1185BC3400075420E /* PlayingCard.h */,
-				285DAFC2185BC3400075420E /* PlayingCard.m */,
+				285DAFC7185BCE160075420E /* Model */,
 				285DAF9B185B98320075420E /* CardGameViewController.h */,
 				285DAF9C185B98320075420E /* CardGameViewController.m */,
 				285DAF9E185B98320075420E /* Images.xcassets */,
@@ -146,6 +137,8 @@
 		285DAF8D185B98310075420E /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				285DAF95185B98320075420E /* CardGameAppDelegate.h */,
+				285DAF96185B98320075420E /* CardGameAppDelegate.m */,
 				285DAF8E185B98310075420E /* Matchismo-Info.plist */,
 				285DAF8F185B98310075420E /* InfoPlist.strings */,
 				285DAF92185B98320075420E /* main.m */,
@@ -171,6 +164,22 @@
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
+		};
+		285DAFC7185BCE160075420E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				285DAFBB185BBD5C0075420E /* Card.h */,
+				285DAFBC185BBD5C0075420E /* Card.m */,
+				285DAFBE185BC0DF0075420E /* Deck.h */,
+				285DAFBF185BC0DF0075420E /* Deck.m */,
+				285DAFC4185BC82E0075420E /* PlayingCardDeck.h */,
+				285DAFC5185BC82E0075420E /* PlayingCardDeck.m */,
+				285DAFC1185BC3400075420E /* PlayingCard.h */,
+				285DAFC2185BC3400075420E /* PlayingCard.m */,
+			);
+			name = Model;
+			path = Matchismo;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -485,6 +494,7 @@
 				285DAFB7185B98320075420E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		285DAFB8185B98320075420E /* Build configuration list for PBXNativeTarget "MatchismoTests" */ = {
 			isa = XCConfigurationList;
@@ -493,6 +503,7 @@
 				285DAFBA185B98320075420E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
