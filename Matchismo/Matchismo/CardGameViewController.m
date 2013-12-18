@@ -89,7 +89,7 @@
         cardButton.enabled = !card.isMatched;
     }
     
-    self.scoreLabel.text = [NSString stringWithFormat:@"TOTAL: %d", self.game.score];
+    self.scoreLabel.text = [NSString stringWithFormat:@"Total: %d", self.game.score];
     
     //update max slider value and current position to last play
     self.playHistorySlider.maximumValue = self.game.numberOfPlays;
@@ -123,9 +123,9 @@
         BOOL matched = [(NSNumber *)historyItem[@"matched"] boolValue];
 
         if (matched) {
-            description = [NSString stringWithFormat:@"MATCHED %@", description];
+            description = [NSString stringWithFormat:@"MATCHED! %@", description];
         } else {
-            description = [NSString stringWithFormat:@"%@ DON'T MATCH!", description];
+            description = [NSString stringWithFormat:@"%@ DIDN'T MATCH!", description];
         }
     }
     
