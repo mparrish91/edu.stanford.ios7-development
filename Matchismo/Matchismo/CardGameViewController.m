@@ -26,8 +26,12 @@
 
 - (CardMatchingGame *)game
 {
-    if (!_game) _game = [[CardMatchingGame alloc] initWithCardCount:[self.cardButtons count]
-                                                          usingDeck:[self createDeck]];
+    if (!_game) {
+        _game = [[CardMatchingGame alloc] initWithCardCount:[self.cardButtons count]
+                                                  usingDeck:[self createDeck]];
+        _game.numberOfCardsToMatch = [self numberOfCardsToMatchForSegment:self.modeSegmentedControl.selectedSegmentIndex];
+    }
+    
     return _game;
 }
 
@@ -46,15 +50,19 @@
     }
 }
 
+- (NSInteger)numberOfCardsToMatchForSegment:(NSInteger)segment {
+    
+    if (segment == 1) {
+        return 3;
+    }
+    
+    return 2;
+}
+
 - (IBAction)touchModeChangeControl:(UISegmentedControl *)sender {
     
     NSInteger currentIndex = sender.selectedSegmentIndex;
-    
-    if (currentIndex == 1) {
-        self.game.numberOfCardsToMatch = 3;
-    } else {
-        self.game.numberOfCardsToMatch = 2;
-    }
+    self.game.numberOfCardsToMatch = [self numberOfCardsToMatchForSegment:currentIndex];
 }
 
 - (IBAction)touchResetButton:(UIButton *)sender {
