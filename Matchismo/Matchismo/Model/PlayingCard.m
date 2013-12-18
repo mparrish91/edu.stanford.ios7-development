@@ -10,6 +10,23 @@
 
 @implementation PlayingCard
 
+- (int)match:(NSArray *)otherCards
+{
+    NSInteger score = 0;
+    
+    for (PlayingCard *otherCard in otherCards) {
+        if ([self.suit isEqualToString:otherCard.suit]) {
+            score += 1;
+        } else if (self.rank == otherCard.rank) { //less ranks than suits.. ie. 4 Kings but 12 Hearts
+            score += 4;
+        }
+    }
+    
+   // NSLog(@"Score %d", score);
+    
+    return score;
+}
+
 - (NSString *)contents
 {
     NSArray *rankStrings = [PlayingCard rankStrings];

@@ -20,11 +20,25 @@
     
     for (Card *card in otherCards) {
         if ([card.contents isEqualToString:self.contents]) {
-            score = 1;
+            score += 1;
         }
     }
     
     return score;
+}
+
+- (NSUInteger)matchCountWithOtherCards:(NSArray *)otherCards
+{
+    NSUInteger matchCount = 0;
+    
+    for (Card *card in otherCards) {
+        NSInteger score = [self match:@[card]];
+        if (score) {
+            matchCount++;
+        }
+    }
+    
+    return matchCount;
 }
 
 @end
