@@ -85,9 +85,8 @@
     if (matchingCount == 4) {
         return 4;
     }
-
     
-    NSLog(@"Score %d", score);
+    //NSLog(@"Score %d", score);
     
     return score;
 }

@@ -83,8 +83,6 @@ static const int COST_TO_CHOOSE = 1;
     NSInteger playScore = 0;
     NSMutableArray *chosenCards = [[NSMutableArray alloc] init];
     
-    //NSLog(@"Chosen cards length: %d", [chosenCards count]);
-    
     //find all the chosen cards
     for (Card *otherCard in self.cards) {
         if (otherCard.isChosen && !otherCard.isMatched) {
@@ -93,9 +91,6 @@ static const int COST_TO_CHOOSE = 1;
     }
     
    // NSLog(@"Chosen cards length: %d", [chosenCards count]);
-   // NSLog(@"Before adding to chosen cards array");
-    //ensure this card is added to array
-    //[chosenCards addObject: card];
     
     NSUInteger chosenCardCount = [chosenCards count];
     
@@ -106,25 +101,10 @@ static const int COST_TO_CHOOSE = 1;
     if (self.numberOfCardsToMatch == chosenCardCount + 1) {
         
         shouldCheckForMatch = YES;
-        
-      /*  for (NSUInteger i = 0; i < chosenCardCount; i++) {
-            
-            Card *matchCard = chosenCards[i];
-            
-            //match this card with all cards after it
-            NSUInteger start = i + 1;
-            NSUInteger numberToGet = chosenCardCount - start;
-            
-            NSArray *cardsToMatch = [chosenCards subarrayWithRange:NSMakeRange(start, numberToGet)];
-            
-            NSInteger matchScore = [matchCard match: cardsToMatch];
-            NSLog(@"match score: %d", matchScore);
-            playScore += matchScore;
-        } */
         playScore = [card match:chosenCards];
         
         if (playScore) {
-            NSLog(@"score before match bonus: %d", playScore);
+            //NSLog(@"score before match bonus: %d", playScore);
             //if we have a score > 0, then apply MATCH_BONUS
             playScore *= MATCH_BONUS;
             //NSLog(@"score after match bonus: %d", playScore);
