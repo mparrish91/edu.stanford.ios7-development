@@ -7,83 +7,95 @@
 //
 
 #import "CardGameViewController.h"
-#import "PlayingCardDeck.h"
-#import "PlayingCard.h"
-#import "CardMatchingGame.h"
+#import "PlayHistoryViewController.h"
 
 @interface CardGameViewController ()
 
-@property (nonatomic, strong) CardMatchingGame *game;
 @property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *cardButtons; //all the buttons connect to a single outlet
-@property (weak, nonatomic) IBOutlet UILabel *scoreLabel;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *modeSegmentedControl;
 @property (weak, nonatomic) IBOutlet UILabel *matchResultLabel;
-@property (weak, nonatomic) IBOutlet UISlider *playHistorySlider;
 
 @end
 
 @implementation CardGameViewController
+
+-(void)viewDidLoad {
+    
+    [super viewDidLoad];
+    self.matchResultLabel.text = nil;
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    
+    [super viewWillAppear:animated];
+    
+    //show card contents
+    [self updateUI];
+}
+
+//abstract method, subclasses MUST implement
+- (Deck *)createDeck {
+    
+    return nil;
+}
+
+//abstract method, subclasses MUST implement
+- (NSAttributedString *)attributedTitleForCard:(Card *)card
+{
+    return nil;
+}
+
+//abstract method, subclasses MUST implement
+- (NSAttributedString *)foregroundTextForCard:(Card *)card
+{
+    return nil;
+}
+
+//abstract method, subclasses MUST implement
+- (UIImage *)backgroundImageForCard:(Card *)card
+{
+    return nil;
+}
 
 - (CardMatchingGame *)game
 {
     if (!_game) {
         _game = [[CardMatchingGame alloc] initWithCardCount:[self.cardButtons count]
                                                   usingDeck:[self createDeck]];
-        _game.numberOfCardsToMatch = [self numberOfCardsToMatchForSegment:self.modeSegmentedControl.selectedSegmentIndex];
     }
     
     return _game;
 }
 
-- (Deck *)createDeck {
-    return [[PlayingCardDeck alloc] init];
-}
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString: @"showPlayHistory"]) {
+        
+        if ([segue.destinationViewController isKindOfClass:[PlayHistoryViewController class]]) {
+            
+            PlayHistoryViewController *playHistoryController = (PlayHistoryViewController *)segue.destinationViewController;
+            
+            NSMutableArray *completePlayHistoryAttributedStrings = [[NSMutableArray alloc] init];
+            
+            for (NSUInteger playNumber = 1; playNumber <= self.game.numberOfPlays; playNumber++) {
+                NSAttributedString *historyItemAttributedString = [self descriptionForGamePlayNumber:playNumber];
+                [completePlayHistoryAttributedStrings addObject:historyItemAttributedString];
+            }
 
-- (IBAction)playHistorySliderChanged:(UISlider *)sender {
-    
-    self.matchResultLabel.attributedText = [self descriptionForGamePlayNumber: sender.value];
-    
-    if (sender.value == self.game.numberOfPlays) {
-        self.matchResultLabel.alpha = 1.0;
-    } else {
-        self.matchResultLabel.alpha = 0.5;
+            playHistoryController.playHistoryAttributedDescriptions = completePlayHistoryAttributedStrings;
+        }
     }
 }
 
-- (NSInteger)numberOfCardsToMatchForSegment:(NSInteger)segment {
-    
-    if (segment == 1) {
-        return 3;
-    }
-    
-    return 2;
-}
-
-- (IBAction)touchModeChangeControl:(UISegmentedControl *)sender {
-    
-    NSInteger currentIndex = sender.selectedSegmentIndex;
-    self.game.numberOfCardsToMatch = [self numberOfCardsToMatchForSegment:currentIndex];
-}
-
-- (IBAction)touchResetButton:(UIButton *)sender {
+- (IBAction)touchResetButton:(UIBarButtonItem *)sender {
     
     self.game = nil;
-    
-    self.modeSegmentedControl.enabled = YES;
-    self.playHistorySlider.hidden = YES;
-    
     [self updateUI];
-    
 }
 
 - (IBAction)touchCardButton:(UIButton *)sender
 {
     NSUInteger cardIndex = [self.cardButtons indexOfObject:sender];
     [self.game chooseCardAtIndex:cardIndex];
-    
-    self.modeSegmentedControl.enabled = NO;
-    self.playHistorySlider.hidden = NO;
-    
     [self updateUI];
 }
 
@@ -92,18 +104,14 @@
     for (UIButton *cardButton in self.cardButtons) {
         NSUInteger cardIndex = [self.cardButtons indexOfObject:cardButton];
         Card *card = [self.game cardAtIndex:cardIndex];
-        [cardButton setTitle:[self titleForCard:card] forState:UIControlStateNormal];
+        [cardButton setAttributedTitle:[self foregroundTextForCard:card] forState:UIControlStateNormal];
         [cardButton setBackgroundImage:[self backgroundImageForCard:card] forState:UIControlStateNormal];
         cardButton.enabled = !card.isMatched;
     }
     
-    self.scoreLabel.text = [NSString stringWithFormat:@"Total: %d", self.game.score];
+    self.navigationItem.title = [NSString stringWithFormat:@"Score: %d", self.game.score];
     
-    //update max slider value and current position to last play
-    self.playHistorySlider.maximumValue = self.game.numberOfPlays;
-    self.playHistorySlider.value = self.game.numberOfPlays;
-    
-    self.matchResultLabel.attributedText = [self descriptionForGamePlayNumber: self.playHistorySlider.value];
+    self.matchResultLabel.attributedText = [self descriptionForGamePlayNumber: self.game.numberOfPlays];
     self.matchResultLabel.alpha = 1.0;
 }
 
@@ -117,28 +125,38 @@
     }
     
     NSDictionary *historyItem = [self.game historyItemAtIndex:playNumber];
+    NSAttributedString *attributedDescription = [self attributedStringDescriptionForHistoryItem:historyItem];
+    
+    return attributedDescription;
+}
+
+- (NSAttributedString *)attributedStringDescriptionForHistoryItem:(NSDictionary *)historyItem
+{
+    NSMutableAttributedString *attributedDescription = [[NSMutableAttributedString alloc] init];
     NSMutableArray *cards = (NSMutableArray *)historyItem[@"cards"];
     
-    NSMutableArray *cardStringArray = [[NSMutableArray alloc] init];
-    
     for (Card *card in cards) {
-        [cardStringArray addObject: card.contents];
+        NSAttributedString *cardTitleAttributedString = [self attributedTitleForCard:card];
+        [attributedDescription appendAttributedString:cardTitleAttributedString];
+        [attributedDescription appendAttributedString:[[NSAttributedString alloc] initWithString:@"\t"]];
     }
-    NSString *description = [cardStringArray componentsJoinedByString:@" "];
+
+    BOOL didMatchCheck = [(NSNumber *)historyItem[@"didCheckForMatch"] boolValue];
     
-    if (self.game.numberOfCardsToMatch == [cards count]) {
+    //did we do a match check on this round
+    if (didMatchCheck) {
         
         BOOL matched = [(NSNumber *)historyItem[@"matched"] boolValue];
-
+        NSString *matchString;
+        
         if (matched) {
-            description = [NSString stringWithFormat:@"MATCHED! %@", description];
+            matchString = @"MATCHED!\t";
         } else {
-            description = [NSString stringWithFormat:@"%@ DIDN'T MATCH!", description];
+            matchString = @"NO MATCH\t";
         }
+        
+        [attributedDescription appendAttributedString:[[NSAttributedString alloc] initWithString: matchString]];
     }
-    
-    //create base attributed string
-    NSMutableAttributedString *attributedDescription = [[NSMutableAttributedString alloc] initWithString: description];
     
     //create dictionary to store attributes
     NSDictionary *attributedProperties;
@@ -147,10 +165,10 @@
     NSString *pointsString;
     
     if (score > 0) {
-        pointsString = [NSString stringWithFormat:@" +%d pts", score];
+        pointsString = [NSString stringWithFormat:@"+%d pts", score];
         attributedProperties = @{NSForegroundColorAttributeName: [UIColor greenColor]};
     } else {
-        pointsString = [NSString stringWithFormat:@" %d pts", score];
+        pointsString = [NSString stringWithFormat:@"%d pts", score];
         attributedProperties = @{NSForegroundColorAttributeName: [UIColor redColor]};
     }
     
@@ -158,16 +176,6 @@
     [attributedDescription appendAttributedString: [[NSAttributedString alloc] initWithString: pointsString attributes: attributedProperties]];
     
     return attributedDescription;
-}
-
-- (NSString *)titleForCard:(Card *)card
-{
-    return card.isChosen ? card.contents : @"";
-}
-
-- (UIImage *)backgroundImageForCard:(Card *)card
-{
-    return [UIImage imageNamed:card.isChosen ? @"cardfront" : @"cardback"];
 }
 
 @end

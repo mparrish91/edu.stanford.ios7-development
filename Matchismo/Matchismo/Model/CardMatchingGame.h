@@ -17,8 +17,9 @@
 - (Card *)cardAtIndex:(NSUInteger)index;
 - (NSDictionary *)historyItemAtIndex:(NSUInteger)index;
 
-@property(nonatomic, readonly) NSInteger score;
-@property(nonatomic, readonly) NSUInteger numberOfPlays;
-@property(nonatomic) NSUInteger numberOfCardsToMatch;
+@property (nonatomic, readonly) NSInteger score;
+@property (nonatomic, readonly) NSUInteger numberOfPlays;
+@property (strong, nonatomic, readonly) NSMutableArray *playHistory;
+@property (nonatomic) NSUInteger numberOfCardsToMatch;
 
 @end

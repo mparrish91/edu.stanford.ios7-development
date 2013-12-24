@@ -7,7 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Deck.h"
+#import "CardMatchingGame.h"
 
 @interface CardGameViewController : UIViewController
+
+@property (nonatomic, strong) CardMatchingGame *game;
+
+//abstract methods, subclasses MUST implement
+- (Deck *)createDeck;
+- (NSAttributedString *)attributedTitleForCard:(Card *)card;
+- (NSAttributedString *)foregroundTextForCard:(Card *)card;
+- (UIImage *)backgroundImageForCard:(Card *)card;
 
 @end

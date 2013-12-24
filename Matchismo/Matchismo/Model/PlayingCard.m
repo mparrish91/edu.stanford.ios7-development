@@ -12,17 +12,51 @@
 
 - (int)match:(NSArray *)otherCards
 {
+    NSMutableArray *allCards = [[NSMutableArray alloc] initWithArray:otherCards];
+    [allCards addObject:self];
+    
+    NSInteger score = [PlayingCard matchCards:allCards];
+    return score;
+}
+
+static const int SUIT_MULTIPLIER = 1;
+static const int RANK_MULTIPLIER = 4;
+
++ (int)matchCards:(NSArray *)cards
+{
     NSInteger score = 0;
+    NSMutableArray *suits = [[NSMutableArray alloc] init];
+    NSMutableArray *ranks = [[NSMutableArray alloc] init];
     
-    for (PlayingCard *otherCard in otherCards) {
-        if ([self.suit isEqualToString:otherCard.suit]) {
-            score += 1;
-        } else if (self.rank == otherCard.rank) { //less ranks than suits.. ie. 4 Kings but 12 Hearts
-            score += 4;
+    for (PlayingCard *card in cards) {
+        
+        NSUInteger suitCount = 0;
+        NSUInteger rankCount = 0;
+        
+        for (PlayingCard *otherCard in cards) {
+            if ([card.suit isEqualToString:otherCard.suit]) {
+                suitCount += [suits containsObject:card.suit] ? 0 : 1;
+            }
+            
+            if (card.rank == otherCard.rank) {
+                rankCount += [ranks containsObject:@(card.rank)] ? 0 : 1;
+            }
         }
+        
+        //NSLog(@"Suits: %d, Rank: %d", suitCount, rankCount);
+        
+        //only include in score if we have counts greater than 1 as 1 is not a match
+        if (suitCount < 2) suitCount = 0;
+        if (rankCount < 2) rankCount = 0;
+        
+        //NSLog(@"Suits: %d, Rank: %d", suitCount, rankCount);
+        
+        [suits addObject:card.suit];
+        [ranks addObject:@(card.rank)];
+        
+        score += (suitCount * SUIT_MULTIPLIER) + (rankCount * RANK_MULTIPLIER);
+        NSLog(@"Score %d", score);
     }
-    
-   // NSLog(@"Score %d", score);
     
     return score;
 }
