@@ -11,7 +11,7 @@
 @interface CardMatchingGame()
 @property (nonatomic, readwrite) NSInteger score; //override readonly in private implementation
 @property (nonatomic, strong) NSMutableArray *cards; //array of Card
-@property (nonatomic, strong) NSMutableArray *playHistory; //array storing played card history
+@property (nonatomic, strong, readwrite) NSMutableArray *playHistory; //array storing played card history
 @end
 
 @implementation CardMatchingGame
@@ -90,27 +90,18 @@ static const int COST_TO_CHOOSE = 1;
         }
     }
     
-    //ensure this card is added to array
-    [chosenCards addObject: card];
+   // NSLog(@"Chosen cards length: %d", [chosenCards count]);
     
     NSUInteger chosenCardCount = [chosenCards count];
     
-    //are we at the matching threshold?
-    if (self.numberOfCardsToMatch == chosenCardCount) {
+    //did we do the match check this go round
+    BOOL shouldCheckForMatch = NO;
+    
+    //are we at the matching threshold? include current card
+    if (self.numberOfCardsToMatch == chosenCardCount + 1) {
         
-        for (NSUInteger i = 0; i < chosenCardCount; i++) {
-            
-            Card *matchCard = chosenCards[i];
-            
-            //match this card with all cards after it
-            NSUInteger start = i + 1;
-            NSUInteger numberToGet = chosenCardCount - start;
-            
-            NSArray *cardsToMatch = [chosenCards subarrayWithRange:NSMakeRange(start, numberToGet)];
-            
-            NSInteger matchScore = [matchCard match: cardsToMatch];
-            playScore += matchScore;
-        }
+        shouldCheckForMatch = YES;
+        playScore = [card match:chosenCards];
         
         if (playScore) {
             //NSLog(@"score before match bonus: %d", playScore);
@@ -145,8 +136,10 @@ static const int COST_TO_CHOOSE = 1;
     
     //ensure card is chosen
     card.chosen = YES;
+    [chosenCards addObject: card];
     
-    NSDictionary *historyItem = @{@"cards": chosenCards, @"matched": @(card.isMatched), @"score": @(playScore)};
+    NSDictionary *historyItem = @{@"cards": chosenCards, @"matched": @(card.isMatched), @"score": @(playScore), @"didCheckForMatch":@(shouldCheckForMatch)};
+    // NSLog(@"Before adding to playHistory array");
     [self.playHistory addObject:historyItem];
     
     //NSLog(@"ENDING SCORE: %d", self.score);
